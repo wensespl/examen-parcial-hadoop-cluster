@@ -1,0 +1,29 @@
+services:
+  master:
+    image: wensespl/hadoop:1.0
+    container_name: hadoop-master
+    hostname: hadoop-master
+    networks:
+      - hadoop
+    ports:
+      - 40070:50070
+      - 8088:8088
+
+  slave1:
+    image: wensespl/hadoop:1.0
+    container_name: hadoop-slave1
+    hostname: hadoop-slave1
+    networks:
+      - hadoop
+  
+  slave2:
+    image: wensespl/hadoop:1.0
+    container_name: hadoop-slave2
+    hostname: hadoop-slave2
+    networks:
+      - hadoop
+
+networks:
+  hadoop:
+    name: hadoop
+    driver: bridge
