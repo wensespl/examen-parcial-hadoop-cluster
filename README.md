@@ -1,4 +1,4 @@
-# pc2-hadoop-cluster
+# examen-parcial-hadoop-cluster
 
 ## Iniciar hadoop cluster
 
