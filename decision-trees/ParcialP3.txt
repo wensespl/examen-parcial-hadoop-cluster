@@ -1,2 +1,2 @@
-High Vote Average	Low Popularity
-Low Vote Average	Low Popularity
+High Budget	High Popularity
+Low Budget	Low Popularity

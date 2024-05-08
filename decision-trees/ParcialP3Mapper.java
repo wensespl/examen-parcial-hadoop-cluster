@@ -1,44 +1,54 @@
 import java.io.IOException;
+
+import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
-public class ParcialP3Mapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
+// Clasifica las películas en función de vote_average
+public class ParcialP3Mapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
-    private Text voteAverageCategory = new Text();
-    private final static IntWritable highPopularity = new IntWritable(1);
-    private final static IntWritable lowPopularity = new IntWritable(0);
+    private Text category = new Text();
 
-    public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         if (key.get() == 0) {
             return;
         }
         String valueString = value.toString();
         String[] singleRowData = valueString.split(";");
 
-        // Supongamos que "adult" es el atributo que se quiere predecir
-        // Índice correspondiente a "vote_average" y "popularity"
+        // Índice correspondiente a "vote_average"
         float voteAverage = Float.parseFloat(singleRowData[1]);
-        float popularity = Float.parseFloat(singleRowData[9]);
+        String row = String.join(";", singleRowData);
 
-        // Clasificar popularidad según el umbral
-        IntWritable popularityClass = (popularity >= 3.72) ? highPopularity : lowPopularity;
-
-        // Dividir según `vote_average` (umbral arbitrario: 7.5)
+        // Classify by vote_average (average threshold: 4.2)
         String category = (voteAverage >= 4.2) ? "High Vote Average" : "Low Vote Average";
 
-        output.collect(new Text(category), popularityClass);
+        output.collect(new Text(category), new Text(row));
     }
 }
 
-//class P3Mapper2 extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
-//
-//    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-//
-//        String[] rowData = value.toString().split("\t");
-//        String[] rowValue = rowData[0].split(",");
-//        int valueInt = Integer.parseInt(rowData[1]);
-//        output.collect(new Text(rowValue[0] + "," + rowValue[1]), new Text(rowValue[2] + "," + valueInt));
-//    }
-//}
+// Classify movies based on budget.
+class P3Mapper2 extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
+
+    private Text category = new Text();
+    private final static IntWritable highPopularity = new IntWritable(1);
+    private final static IntWritable lowPopularity = new IntWritable(0);
+
+    public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+
+        String[] rowData = value.toString().split(";");
+        // Index of relevant columns
+        float budget = Float.parseFloat(rowData[8]);
+        float popularity = Float.parseFloat(rowData[9]);
+
+        // Classify by budget (average threshold: 1558221)
+        String budgetCategory = (budget >= 1558221) ? "High Budget" : "Low Budget";
+
+        // Define the popularity (average threshold: 3.7)
+        IntWritable popularityCategory = popularity >= 3.7 ? highPopularity : lowPopularity;
+
+        output.collect(new Text(budgetCategory), popularityCategory);
+    }
+}
