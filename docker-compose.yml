@@ -8,6 +8,8 @@ services:
     ports:
       - 40070:50070
       - 8088:8088
+    volumes:
+      - ./app:/root/app
 
   slave1:
     image: wensespl/hadoop:1.0
